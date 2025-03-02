@@ -2,7 +2,7 @@
 
 namespace ChannelsTest;
 
-public class Consumer(Channel<SomeDto> channel, ManualResetEventSlim manualResetEventSlim)
+public class Consumer(Channel<SomeDto> channel)
 {
     public async Task ConsumeChannel(CancellationToken cancellationToken)
     {
@@ -11,7 +11,6 @@ public class Consumer(Channel<SomeDto> channel, ManualResetEventSlim manualReset
         {
             await Task.Delay(TimeSpan.FromSeconds(2), cancellationToken);
             Console.WriteLine($"Received: {dto}");
-            manualResetEventSlim.Set();
         }
     }
 }
