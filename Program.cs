@@ -13,16 +13,13 @@ var channel = Channel.CreateBounded<SomeDto>(new BoundedChannelOptions(1)
 var consumer = new Consumer(channel);
 var producer = new Producer(channel);
 var cancellationToken = cancellationTokenSource.Token;
-_ = Task.Run(() => consumer.ConsumeChannel(cancellationToken), cancellationToken);
+var consumerTask = Task.Run(() => consumer.ConsumeChannel(cancellationToken), cancellationToken);
 
 for (var i = 0; i < 5; i++)
 {
-    if (await producer.WaitProducerToBeReady(cancellationToken))
-    {
-        var trade = SomeDto.CreateNew(i);
-        await producer.Send(trade);
-    }
+    var trade = SomeDto.CreateNew(i);
+    await producer.Send(trade);
 }
-channel.Writer.Complete();
-await channel.Reader.Completion;
-await cancellationTokenSource.CancelAsync();
+
+await producer.Complete(cancellationToken);
+await consumerTask;

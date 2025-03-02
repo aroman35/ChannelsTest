@@ -9,8 +9,10 @@ public class Consumer(Channel<SomeDto> channel)
         var queue = channel.Reader.ReadAllAsync(cancellationToken);
         await foreach (var dto in queue)
         {
-            await Task.Delay(TimeSpan.FromSeconds(2), cancellationToken);
-            Console.WriteLine($"Received: {dto}");
+            await Task.Delay(TimeSpan.FromMilliseconds(1000), cancellationToken);
+            await Console.Out.WriteLineAsync($"Received: {dto}");
         }
+        await channel.Reader.Completion;
+        await Console.Out.WriteLineAsync("Consumption completed");
     }
 }
